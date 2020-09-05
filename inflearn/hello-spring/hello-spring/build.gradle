@@ -1,0 +1,25 @@
+plugins {
+	id 'org.springframework.boot' version '2.3.3.RELEASE' // springboot version
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+}
+
+group = 'HELLO'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8' // java 11 version
+
+repositories {
+	mavenCentral() // 라이브러리를 다운로드 받는 사이트를 지정, 특정 사이트 url넣을 수 있음
+}
+
+dependencies { // start.spring.io에서 선택한 것들이 여기에 들어감
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // templete engine
+	implementation 'org.springframework.boot:spring-boot-starter-web' // web project
+	testImplementation('org.springframework.boot:spring-boot-starter-test') { // junit - test를 위한 라이브러리
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
