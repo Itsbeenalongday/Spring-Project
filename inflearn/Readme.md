@@ -2,7 +2,7 @@
 
 인프런 인강들으면서 스프링부트 입문하기
 
-## Spring project 생성
+## Spring project setting
 
 [spring project 생성](start.spring.io)
 
@@ -31,7 +31,7 @@ m*: 정식 릴리즈가 안된 버전
 
 탬플릿 엔진: html을 만들어 주는 역할
 
-## 파일 구조
+**파일 구조**
 
 ```
 `-- hello-spring
@@ -84,7 +84,7 @@ test {
 }
 ```
 
-## 실행
+**실행**
 
 ```
 Tomcat started on port(s): 8080 (http) with context path ''
@@ -92,7 +92,7 @@ Tomcat started on port(s): 8080 (http) with context path ''
 
 `localhost:8080`
 
-## 라이브러리 살펴보기
+**라이브러리 살펴보기**
 
 `라이브러리가 의존한다.`
 
@@ -132,7 +132,7 @@ external libraries에서 확인할 수 있다.
 [스프링 공식 튜토리얼](https://spring.io/guides/gs/serving-web-content/)
 [스프링부트 메뉴얼](https://docs.spring.io/spring-boot/docs/2.3.1.RELEASE/reference/html/spring-boot-features.html#boot-features-spring-mvc-template-engines)
 
-## controller
+**controller**
 
 1. controller만들기
 java/HELLO.hellospring위치에서,   
@@ -162,7 +162,7 @@ public class HelloController {
     + 스프링 부트 템플릿엔진 기본 viewName 매핑
     + resources:templates/ +{ViewName}+ .html
 
-## terminal로 server 실행하기
+**terminal로 server 실행하기**
 
 bulid와 실행
 
@@ -185,3 +185,100 @@ $ cd build/libs
 
 $ java -jar hello-spring-0.0.1-SNAPSHOT.jar
 ```
+
+## spring web 개발 기초
+
+`크게 3가지 방식이 있다.`
+
+> 정적 컨텐츠
+
++ 서버에서 하는 것 없이 파일을 그대로 브라우저로 전송
+
+> MVC와 템플릿 엔진
+
++ JSP, PHP가 소위 말하는 Templete engine인데, server에서 프로그래밍된 결과가 반영되어 html을 동적으로 만듦
+
+> API
+
++ Json을 client로 전달하는 방식, react나 viewjs와 같은 것들은 json을 받아 화면을 그린다.
++ server끼리 통신할 때
+
+**정적컨텐츠**
+
+resources/static 위치에 html파일을 생성하면 된다.
+
+![구조](../img/staticcontent.PNG)
+
+**MVC와 템플릿 엔진**
+
+resources/template 위치에 html을 넣고
+
+controller를 맞게 만들어 준다.
+
+```java
+@GetMapping("hello-mvc") // loacalhost:8080/hello-mvc
+// view를 그리기 위해 params를 넘겨야 한다. url 요청자가 params를 넘겨야한다.
+// localhost:8080/hello-mvc?name=content
+    public String helloMvc(@RequestParam("name") String name, Model model){ 
+        model.addAttribute("name", name); // name이라는 key에 들어온 내용을 저장
+        return "hello-template"; // hello-template.html로 이동
+    }
+```
+
+**API 방식**
+
+@ResponseBody 를 사용
+HTTP의 BODY에 문자 내용을 직접 반환
+viewResolver 대신에 HttpMessageConverter 가 동작
+기본 문자처리: StringHttpMessageConverter
+기본 객체처리: MappingJackson2HttpMessageConverter (Jackson2는 객체를 json으로 바꾸는 library)
+byte 처리 등등 기타 여러 HttpMessageConverter가 기본으로 등록되어 있음
+
+> 참고: 클라이언트의 HTTP Accept 해더와 서버의 컨트롤러 반환 타입 정보 둘을 조합해서
+HttpMessageConverter 가 선택된다.
+
++ @ResponseBody 문자 반환
+
+```java
+public class HelloController {
+    @GetMapping("hello-string")
+    @ResponseBody
+    public String helloString(@RequestParam("name") String name) {
+    return "hello " + name;
+    }
+}
+```
+
+@ResponseBody 를 사용하면 뷰 리졸버( viewResolver )를 사용하지 않음
+대신에 HTTP의 BODY에 문자 내용을 직접 반환(HTML BODY TAG를 말하는 것이 아님)
+
+실행
+http://localhost:8080/hello-string?name=spring
+
++ @ResponseBody 객체 반환
+
+```java
+@Controller
+public class HelloController {
+    @GetMapping("hello-api")
+    @ResponseBody
+    public Hello helloApi(@RequestParam("name") String name) {
+        Hello hello = new Hello();
+        hello.setName(name);
+        return hello;
+    }
+    static class Hello {
+        private String name;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+}
+```
+
+@ResponseBody 를 사용하고, 객체를 반환하면 객체가 JSON으로 변환됨
+
+![](../img/responsebody.PNG)
