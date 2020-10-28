@@ -282,3 +282,5 @@ public class HelloController {
 @ResponseBody 를 사용하고, 객체를 반환하면 객체가 JSON으로 변환됨
 
 ![](../img/responsebody.PNG)
+
+```
